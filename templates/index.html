@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <title>Code Smell Detector</title>
+    <style>
+      #result {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h1 class="text-center">Code Smell Detector</h1>
+      <form id="upload-form" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="file">Upload a Python File:</label>
+          <input
+            type="file"
+            class="form-control"
+            id="file"
+            name="file"
+            accept=".py"
+            required
+          />
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Upload</button>
+      </form>
+      <div id="result" class="mt-4">
+        <h3>Code Smells:</h3>
+        <pre id="output"></pre>
+      </div>
+    </div>
+
+    <script>
+      document.getElementById("upload-form").onsubmit = function (e) {
+        e.preventDefault();
+        var formData = new FormData(this);
+
+        fetch("/upload", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(
+                "Network response was not ok " + response.statusText
+              );
+            }
+            return response.json();
+          })
+          .then((data) => {
+            document.getElementById("output").textContent = JSON.stringify(
+              data,
+              null,
+              2
+            );
+            document.getElementById("result").style.display = "block";
+          })
+          .catch((err) => {
+            document.getElementById("output").textContent =
+              "Error: " + err.message;
+            document.getElementById("result").style.display = "block";
+          });
+      };
+    </script>
+  </body>
+</html>
